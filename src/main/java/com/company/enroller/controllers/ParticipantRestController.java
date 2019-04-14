@@ -65,5 +65,5 @@ public class ParticipantRestController {
 		return new ResponseEntity(participant, HttpStatus.OK);
 	}
 	
-	// heroku test
+	// heroku test2
 }

@@ -64,4 +64,6 @@ public class ParticipantRestController {
 		participantService.update(participant);
 		return new ResponseEntity(participant, HttpStatus.OK);
 	}
+	
+	// heroku test
 }

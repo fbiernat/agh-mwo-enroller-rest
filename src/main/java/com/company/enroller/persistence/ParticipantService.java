@@ -19,4 +19,12 @@ public class ParticipantService {
 		return connector.getSession().createCriteria(Participant.class).list();
 	}
 
+	public Participant findByLogin(String login) {
+		return (Participant) connector.getSession().createCriteria(Participant.class, login).list().get(0);
+	}
+	
+	public void add(Participant participant) {
+		
+	}
+	
 }

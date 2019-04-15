@@ -40,9 +40,6 @@ public class MeetingService {
 		return meeting.getParticipants();
 	}
 
-	public Participant getMeetingParticipant(long meetingId, long participantId) {
-		return null;
-	}
 
 	
 }

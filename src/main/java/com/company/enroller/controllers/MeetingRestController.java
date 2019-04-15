@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ public class MeetingRestController {
 	@Autowired
 	ParticipantService participantService;
 
+	// Get meetings
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<?> getAllMettings() {
 		Collection<Meeting> meetings = meetingService.getAll();
@@ -40,23 +42,25 @@ public class MeetingRestController {
 	}
 	
 	@RequestMapping(value = "/{id}/participants", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllMeetingParticipants(@PathVariable("id") int meetingId) {
+	public ResponseEntity<?> getAllMeetingParticipants(@PathVariable("id") long meetingId) {
 		Collection<Participant> participants = meetingService.getParticipants(meetingId);
 		if (participants == null) 
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/{id}/participants/{participantId}", method = RequestMethod.POST)
+	// Add meeting
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	public ResponseEntity<?> addParticipant(@RequestBody Meeting newMeeting) {
+		if (meetingService.getMeeting(newMeeting.getId()) != null) 
+			return new ResponseEntity("Unable to add, meeting already exist", HttpStatus.CONFLICT);
+		meetingService.add(newMeeting);
+		return new ResponseEntity("Meeting added", HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/participants", method = RequestMethod.POST)
 	public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long meetingId, @PathVariable("participantId") String participantId) {
-		Participant participant = meetingService.getMeetingParticipant(meetingId, participantId);
-		if (participant == null)
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		return new ResponseEntity("Participant added", HttpStatus.OK);
 	}
 	
-	// pobrac spotkanie
-	// pobrac uczestnika
-	
-	// dodac uczestnika do spotkania
 }

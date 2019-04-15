@@ -26,23 +26,25 @@ public class MeetingRestController {
 	@Autowired
 	ParticipantService participantService;
 
-	// Get meetings
+	// Get all meetings
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllMettings() {
+	public ResponseEntity<?> getAll() {
 		Collection<Meeting> meetings = meetingService.getAll();
 		return new ResponseEntity<Collection<Meeting>>(meetings, HttpStatus.OK);
 	}
 	
+	// Get specific meeting
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> getMeeting(@PathVariable("id") long id) {
+	public ResponseEntity<?> get(@PathVariable("id") long id) {
 		Meeting meeting = meetingService.getMeeting(id);
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		return new ResponseEntity<Meeting>(meeting, HttpStatus.OK);
 	}
 	
+	// Get meeting's participants
 	@RequestMapping(value = "/{id}/participants", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllMeetingParticipants(@PathVariable("id") long meetingId) {
+	public ResponseEntity<?> getAllParticipants(@PathVariable("id") long meetingId) {
 		Collection<Participant> participants = meetingService.getParticipants(meetingId);
 		if (participants == null) 
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -58,9 +60,42 @@ public class MeetingRestController {
 		return new ResponseEntity("Meeting added", HttpStatus.OK);
 	}
 	
+	// Add participant to the meeting
 	@RequestMapping(value = "/{id}/participants", method = RequestMethod.POST)
-	public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long meetingId, @PathVariable("participantId") String participantId) {
+	public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long meetingId, @RequestBody Participant newParticipant) {
+		Meeting meeting = meetingService.getMeeting(meetingId);
+		if (meeting == null)
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		meetingService.addParticipant(meetingId, newParticipant);
+		
 		return new ResponseEntity("Participant added", HttpStatus.OK);
+	}
+	
+	// Update meeting
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	public ResponseEntity<?> updateMeeting(@PathVariable("id") long meetingId, @RequestBody Meeting updatedMeeting) {
+		Meeting meeting = meetingService.getMeeting(meetingId);
+		if (meeting == null)
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		meeting.setTitle(updatedMeeting.getTitle());
+		meeting.setDescription(updatedMeeting.getDescription());
+		meeting.setDate(updatedMeeting.getDate());
+		meetingService.update(meeting);
+		
+		return new ResponseEntity(this.getAll().getBody(), HttpStatus.OK);
+	}
+	
+	// Remove meeting's participant
+	@RequestMapping(value = "/{id}/participants/{participantId}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> deleteParticipant(@PathVariable("id") long meetingId, @PathVariable("participantId") String login) {
+		Meeting meeting = meetingService.getMeeting(meetingId);
+		Participant participant = participantService.findByLogin(login);
+		if (meeting == null || participant == null)
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		meeting.removeParticipant(participant);
+		meetingService.update(meeting);
+		
+		return new ResponseEntity(HttpStatus.OK);
 	}
 	
 }

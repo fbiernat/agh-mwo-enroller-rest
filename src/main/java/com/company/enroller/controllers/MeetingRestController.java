@@ -99,5 +99,15 @@ public class MeetingRestController {
 
 		return new ResponseEntity(this.getAll().getBody(), HttpStatus.OK);
 	}
+	
+	// Delete meeting
+	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> deleteMeeting(@PathVariable("id") long meetingId) {
+		Meeting meeting = meetingService.getMeeting(meetingId);
+		if (meeting == null)
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		meetingService.delete(meeting);
+		return new ResponseEntity(HttpStatus.OK);
+	}
 
 }

@@ -112,7 +112,7 @@ public class MeetingRestController {
 	}
 
 	// 3 ---------------------------------------------------------------
-	// Sort meeting list by meeting title
+	// Sort meetings by title
 	@RequestMapping(value = "/sort/{attr}", method = RequestMethod.GET)
 	public ResponseEntity<?> getSortedMeetings(@PathVariable("attr") String attr) {
 		Collection<Meeting> result = null;
@@ -123,6 +123,17 @@ public class MeetingRestController {
 		}
 		if (result == null) 
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Collection<Meeting>>(result, HttpStatus.OK);
+	}
+	
+	// Search in meetings' titles and descriptions
+	@RequestMapping(value = "/search/{phrase}", method = RequestMethod.GET)
+	public ResponseEntity<?> searchMeeting(@PathVariable("phrase") String phrase) {
+		Collection<Meeting> result = null;
+		result = meetingService.searchTitleAndDesc(phrase);
+		if (result == null || result.size() == 0) 
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		
 		return new ResponseEntity<Collection<Meeting>>(result, HttpStatus.OK);
 	}
 	

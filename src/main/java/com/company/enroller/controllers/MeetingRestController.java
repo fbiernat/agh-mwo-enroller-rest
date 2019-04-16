@@ -34,7 +34,7 @@ public class MeetingRestController {
 	}
 
 	// Get specific meeting
-	@RequestMapping(value = "{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> get(@PathVariable("id") long id) {
 		Meeting meeting = meetingService.getMeeting(id);
 		if (meeting == null)
@@ -72,6 +72,7 @@ public class MeetingRestController {
 		return new ResponseEntity("Participant added", HttpStatus.OK);
 	}
 
+	// 2 ---------------------------------------------------------------
 	// Update meeting
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<?> updateMeeting(@PathVariable("id") long meetingId, @RequestBody Meeting updatedMeeting) {
@@ -101,7 +102,7 @@ public class MeetingRestController {
 	}
 	
 	// Delete meeting
-	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteMeeting(@PathVariable("id") long meetingId) {
 		Meeting meeting = meetingService.getMeeting(meetingId);
 		if (meeting == null)
@@ -110,4 +111,19 @@ public class MeetingRestController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
+	// 3 ---------------------------------------------------------------
+	// Sort meeting list by meeting title
+	@RequestMapping(value = "/sort/{attr}", method = RequestMethod.GET)
+	public ResponseEntity<?> getSortedMeetings(@PathVariable("attr") String attr) {
+		Collection<Meeting> result = null;
+		if (attr.toLowerCase().equals("title")) {
+			result = meetingService.getSortedByTitle();
+		} else {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		}
+		if (result == null) 
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Collection<Meeting>>(result, HttpStatus.OK);
+	}
+	
 }

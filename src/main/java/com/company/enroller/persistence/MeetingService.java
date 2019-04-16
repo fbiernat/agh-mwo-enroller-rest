@@ -2,6 +2,7 @@ package com.company.enroller.persistence;
 
 import java.util.Collection;
 
+import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,11 @@ public class MeetingService {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().delete(meeting);
 		transaction.commit();
+	}
+
+	public Collection<Meeting> getSortedByTitle() {
+		Query query = connector.getSession().createQuery("FROM Meeting ORDER BY lower(title) asc");
+		return query.list();
 	}
 
 }

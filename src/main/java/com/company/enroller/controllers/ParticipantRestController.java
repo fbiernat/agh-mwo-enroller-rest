@@ -62,8 +62,7 @@ public class ParticipantRestController {
 		}
 		participant.setPassword(updatedParticipant.getPassword());
 		participantService.update(participant);
-		return new ResponseEntity(participant, HttpStatus.OK);
+		return new ResponseEntity<Participant>(participant, HttpStatus.OK);
 	}
 	
-	// heroku test2
 }

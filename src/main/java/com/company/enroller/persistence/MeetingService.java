@@ -74,4 +74,11 @@ public class MeetingService {
 		return query.list();
 	}
 
+	public Collection<Meeting> searchByParticipant(String participant) {
+		String hql = "SELECT m FROM Meeting m JOIN m.participants p WHERE p.login LIKE ?";
+		Query query = connector.getSession().createQuery(hql);
+		query.setParameter(0, participant);
+		return query.list();
+	}
+
 }

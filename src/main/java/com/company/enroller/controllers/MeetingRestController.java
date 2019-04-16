@@ -30,6 +30,7 @@ public class MeetingRestController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<?> getAll() {
 		Collection<Meeting> meetings = meetingService.getAll();
+
 		return new ResponseEntity<Collection<Meeting>>(meetings, HttpStatus.OK);
 	}
 
@@ -39,6 +40,7 @@ public class MeetingRestController {
 		Meeting meeting = meetingService.getMeeting(id);
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
+
 		return new ResponseEntity<Meeting>(meeting, HttpStatus.OK);
 	}
 
@@ -48,6 +50,7 @@ public class MeetingRestController {
 		Collection<Participant> participants = meetingService.getParticipants(meetingId);
 		if (participants == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
+
 		return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
 	}
 
@@ -57,6 +60,7 @@ public class MeetingRestController {
 		if (meetingService.getMeeting(newMeeting.getId()) != null)
 			return new ResponseEntity("Unable to add, meeting already exist", HttpStatus.CONFLICT);
 		meetingService.add(newMeeting);
+
 		return new ResponseEntity("Meeting added", HttpStatus.OK);
 	}
 
@@ -100,7 +104,7 @@ public class MeetingRestController {
 
 		return new ResponseEntity(this.getAll().getBody(), HttpStatus.OK);
 	}
-	
+
 	// Delete meeting
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteMeeting(@PathVariable("id") long meetingId) {
@@ -108,6 +112,7 @@ public class MeetingRestController {
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meetingService.delete(meeting);
+		
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
@@ -121,20 +126,35 @@ public class MeetingRestController {
 		} else {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
-		if (result == null) 
+		if (result == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
+
 		return new ResponseEntity<Collection<Meeting>>(result, HttpStatus.OK);
 	}
-	
+
 	// Search in meetings' titles and descriptions
-	@RequestMapping(value = "/search/{phrase}", method = RequestMethod.GET)
+	@RequestMapping(value = "/search/titledesc/{phrase}", method = RequestMethod.GET)
 	public ResponseEntity<?> searchMeeting(@PathVariable("phrase") String phrase) {
 		Collection<Meeting> result = null;
 		result = meetingService.searchTitleAndDesc(phrase);
-		if (result == null || result.size() == 0) 
+		if (result == null || result.size() == 0)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
-		
+
 		return new ResponseEntity<Collection<Meeting>>(result, HttpStatus.OK);
 	}
-	
+
+	// Search meeting by participant
+	@RequestMapping(value = "/search/participants/{login}", method = RequestMethod.GET)
+	public ResponseEntity<?> searchMeetingByParticipant(@PathVariable("login") String participant) {
+		System.out.println(participant);
+		if (participant.equals(""))
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		Collection<Meeting> result = null;
+		result = meetingService.searchByParticipant(participant);
+		if (result.size() == 0)
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+
+		return new ResponseEntity<Collection<Meeting>>(result, HttpStatus.OK);
+	}
+
 }

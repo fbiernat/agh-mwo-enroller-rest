@@ -20,11 +20,18 @@ import com.company.enroller.persistence.ParticipantService;
 @RequestMapping("/meetings")
 public class MeetingRestController {
 
+	private MeetingService meetingService;
+	private ParticipantService participantService;
+	
 	@Autowired
-	MeetingService meetingService;
+	public void setMeetingService(MeetingService meetingService) {
+		this.meetingService = meetingService;
+	}
 
 	@Autowired
-	ParticipantService participantService;
+	public void setParticipantService(ParticipantService participantService) {
+		this.participantService = participantService;
+	}
 
 	// Get all meetings
 	@RequestMapping(value = "", method = RequestMethod.GET)

@@ -18,8 +18,12 @@ import com.company.enroller.persistence.ParticipantService;
 @RequestMapping("/participants")
 public class ParticipantRestController {
 
+	private ParticipantService participantService;
+	
 	@Autowired
-	ParticipantService participantService;
+	public void setParticipantService(ParticipantService participantService) {
+		this.participantService = participantService;
+	}
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<?> getParticipants() {

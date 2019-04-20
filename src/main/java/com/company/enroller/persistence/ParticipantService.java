@@ -24,10 +24,11 @@ public class ParticipantService {
 		return (Participant) connector.getSession().get(Participant.class, login);
 	}
 	
-	public void add(Participant participant) {
+	public Participant add(Participant participant) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().save(participant);
 		transaction.commit();
+		return participant;
 	}
 	
 	public void delete(Participant participant) {

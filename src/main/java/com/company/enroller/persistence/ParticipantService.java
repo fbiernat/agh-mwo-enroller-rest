@@ -23,26 +23,26 @@ public class ParticipantService {
 	public Participant findByLogin(String login) {
 		return (Participant) connector.getSession().get(Participant.class, login);
 	}
-	
+
 	public Participant add(Participant participant) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().save(participant);
 		transaction.commit();
 		return participant;
 	}
-	
+
 	public Participant delete(Participant participant) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().delete(participant);
 		transaction.commit();
 		return participant;
 	}
-	
+
 	public Participant update(Participant participant) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().update(participant);
 		transaction.commit();
 		return participant;
 	}
-	
+
 }

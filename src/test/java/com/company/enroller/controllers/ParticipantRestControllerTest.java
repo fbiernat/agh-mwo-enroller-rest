@@ -9,12 +9,12 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collection;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class ParticipantRestControllerTest {
 	private ParticipantService participantService;
 
 	@Test
-	public void getParticipants() throws Exception {
+	public void testGetParticipants() throws Exception {
 		Participant participant = new Participant();
 		participant.setLogin("testlogin");
 		participant.setPassword("testpassword");
@@ -55,14 +55,13 @@ public class ParticipantRestControllerTest {
 	}
 
 	@Test
-	public void addParticipant() throws Exception {
+	public void testAddParticipant() throws Exception {
 		Participant participant = new Participant();
 		participant.setLogin("testlogin");
 		participant.setPassword("testpassword");
 		String inputJSON = "{\"login\": \"testlogin\", \"password\": \"somepassword\"}";
 
 		given(participantService.findByLogin("testlogin")).willReturn((Participant) null);
-		
 		given(participantService.add(participant)).willReturn(participant);
 		mvc.perform(post("/participants").content(inputJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isCreated());
@@ -75,27 +74,43 @@ public class ParticipantRestControllerTest {
 	}
 
 	@Test
-	public void updateParticipant() throws Exception {
+	public void testUpdateParticipant() throws Exception {
 		Participant updatedParticipant = new Participant();
 		updatedParticipant.setLogin("testlogin");
 		updatedParticipant.setPassword("newpassword");
 		String uInputJSON = "{\"login\": \"testlogin\", \"password\": \"newpassword\"}";
 
-		given(participantService.update(updatedParticipant)).willReturn(updatedParticipant);
 		given(participantService.findByLogin("testlogin")).willReturn((Participant) null);
+		given(participantService.update(updatedParticipant)).willReturn(updatedParticipant);
 		mvc.perform(put("/participants/" + updatedParticipant.getLogin()).content(uInputJSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
-		
+
 		Participant participant = new Participant();
 		participant.setLogin("testlogin");
 		participant.setPassword("oldpassword");
-		
-		given(participantService.update(updatedParticipant)).willReturn(updatedParticipant);
+
 		given(participantService.findByLogin("testlogin")).willReturn(participant);
+		given(participantService.update(updatedParticipant)).willReturn(updatedParticipant);
 		mvc.perform(put("/participants/" + updatedParticipant.getLogin()).content(uInputJSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
 		verify(participantService, times(2)).findByLogin("testlogin");
 	}
 
+	@Test
+	public void testDeleteParticipant() throws Exception {
+		Participant participant = new Participant();
+		participant.setLogin("login");
+		participant.setPassword("password");
+
+		given(participantService.findByLogin(participant.getLogin())).willReturn((Participant) null);
+		given(participantService.delete(participant)).willReturn(participant);
+		mvc.perform(delete("/participants/" + participant.getLogin())).andExpect(status().isNotFound());
+
+		given(participantService.findByLogin(participant.getLogin())).willReturn(participant);
+		given(participantService.delete(participant)).willReturn(participant);
+		mvc.perform(delete("/participants/" + participant.getLogin())).andExpect(status().isOk());
+
+		verify(participantService, times(2)).findByLogin(participant.getLogin());
+	}
 }

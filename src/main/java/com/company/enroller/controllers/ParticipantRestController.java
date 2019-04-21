@@ -62,7 +62,7 @@ public class ParticipantRestController {
 	public ResponseEntity<?> updateParticipant(@PathVariable("id") String login, @RequestBody Participant updatedParticipant) {
 		Participant participant = participantService.findByLogin(login);
 		if (participant == null) { 
-			return new ResponseEntity("Unable to modify. A participant with login " + participant.getLogin() + " doesn't exist.", HttpStatus.NOT_FOUND);
+			return new ResponseEntity("Unable to modify. A participant with login " + login + " doesn't exist.", HttpStatus.NOT_FOUND);
 		}
 		participant.setPassword(updatedParticipant.getPassword());
 		participantService.update(participant);

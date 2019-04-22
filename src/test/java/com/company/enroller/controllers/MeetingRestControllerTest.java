@@ -46,6 +46,9 @@ public class MeetingRestControllerTest {
 	private Meeting meeting;
 	private Participant participant;
 
+	private String meetingInputJSON = "{\"id\": \"1\", \"title\": \"meetingtitle\", \"description\": \"meetingdescription\", \"date\": \"22-04-2019\"}";
+	private String participantInputJSON = "{\"login\": \"testlogin\", \"password\": \"testpassword\"}";
+
 	@Before
 	public void setup() {
 		meeting = new Meeting();
@@ -85,9 +88,20 @@ public class MeetingRestControllerTest {
 		mvc.perform(get("/meetings/" + meeting.getId() + "/participants").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
 				.andExpect(jsonPath("$[0].login", is(participant.getLogin())));
-		
-		given(meetingService.getParticipants(meeting.getId())).willReturn((Collection<Participant>)null);
+
+		given(meetingService.getParticipants(meeting.getId())).willReturn((Collection<Participant>) null);
 		mvc.perform(get("/meetings/" + meeting.getId() + "/participants").contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isNotFound());
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void testAddMeeting() throws Exception {
+		given(meetingService.add(meeting)).willReturn(meeting);
+		mvc.perform(post("/meetings").content(meetingInputJSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+
+		given(meetingService.getMeeting(meeting.getId())).willReturn(meeting);
+		mvc.perform(post("/meetings").content(meetingInputJSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isConflict());
 	}
 }

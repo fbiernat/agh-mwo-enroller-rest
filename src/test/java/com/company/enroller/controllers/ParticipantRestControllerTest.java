@@ -64,7 +64,7 @@ public class ParticipantRestControllerTest {
 		given(participantService.findByLogin("testlogin")).willReturn((Participant) null);
 		given(participantService.add(participant)).willReturn(participant);
 		mvc.perform(post("/participants").content(inputJSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isCreated());
+				.andExpect(status().isCreated()).andExpect(jsonPath("$.login", is(participant.getLogin())));
 
 		given(participantService.findByLogin("testlogin")).willReturn(participant);
 		mvc.perform(post("/participants").content(inputJSON).contentType(MediaType.APPLICATION_JSON))
@@ -92,7 +92,8 @@ public class ParticipantRestControllerTest {
 		given(participantService.findByLogin("testlogin")).willReturn(participant);
 		given(participantService.update(updatedParticipant)).willReturn(updatedParticipant);
 		mvc.perform(put("/participants/" + updatedParticipant.getLogin()).content(uInputJSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.login", is(updatedParticipant.getLogin())));
 
 		verify(participantService, times(2)).findByLogin("testlogin");
 	}
@@ -109,7 +110,8 @@ public class ParticipantRestControllerTest {
 
 		given(participantService.findByLogin(participant.getLogin())).willReturn(participant);
 		given(participantService.delete(participant)).willReturn(participant);
-		mvc.perform(delete("/participants/" + participant.getLogin())).andExpect(status().isOk());
+		mvc.perform(delete("/participants/" + participant.getLogin())).andExpect(status().isOk())
+				.andExpect(jsonPath("$.login", is(participant.getLogin())));
 
 		verify(participantService, times(2)).findByLogin(participant.getLogin());
 	}

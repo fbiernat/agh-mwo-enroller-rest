@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,17 +43,51 @@ public class MeetingRestControllerTest {
 	@MockBean
 	private ParticipantService participantService;
 
-	@Test
-	public void testGetMeetings() throws Exception {
-		Meeting meeting = new Meeting();
+	private Meeting meeting;
+	private Participant participant;
+
+	@Before
+	public void setup() {
+		meeting = new Meeting();
 		meeting.setId(1);
 		meeting.setTitle("meetingtitle");
-		meeting.setDate("meetingdescription");
+		meeting.setDescription("meetingdescription");
 		meeting.setDate("22-04-2019");
 
+		participant = new Participant();
+		participant.setLogin("testlogin");
+		participant.setPassword("testpassword");
+	}
+
+	@Test
+	public void testGetMeetings() throws Exception {
 		Collection<Meeting> allMeetings = singletonList(meeting);
 		given(meetingService.getAll()).willReturn(allMeetings);
 		mvc.perform(get("/meetings").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1))).andExpect(jsonPath("$[0].title", is(meeting.getTitle())));
+	}
+
+	@Test
+	public void testGetMeeting() throws Exception {
+		given(meetingService.getMeeting(meeting.getId())).willReturn((Meeting) null);
+		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		given(meetingService.getMeeting(meeting.getId())).willReturn(meeting);
+		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.title", is(meeting.getTitle())));
+	}
+
+	@Test
+	public void testGetMeetingParticipants() throws Exception {
+		Collection<Participant> meetingParticipants = singletonList(participant);
+		given(meetingService.getParticipants(meeting.getId())).willReturn(meetingParticipants);
+		mvc.perform(get("/meetings/" + meeting.getId() + "/participants").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
+				.andExpect(jsonPath("$[0].login", is(participant.getLogin())));
+		
+		given(meetingService.getParticipants(meeting.getId())).willReturn((Collection<Participant>)null);
+		mvc.perform(get("/meetings/" + meeting.getId() + "/participants").contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound());
 	}
 }

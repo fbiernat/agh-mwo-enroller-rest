@@ -33,31 +33,35 @@ public class MeetingService {
 		return meeting.getParticipants();
 	}
 
-	public void add(Meeting meeting) {
+	public Meeting add(Meeting meeting) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().save(meeting);
 		transaction.commit();
+		return meeting;
 	}
 
-	public void addParticipant(long meetingId, Participant newParticipant) {
+	public Participant addParticipant(long meetingId, Participant newParticipant) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		Meeting meeting = this.getMeeting(meetingId);
 		meeting.addParticipant(newParticipant);
 		connector.getSession().save(meeting);
 		connector.getSession().save(newParticipant);
 		transaction.commit();
+		return newParticipant;
 	}
 
-	public void update(Meeting meeting) {
+	public Meeting update(Meeting meeting) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().update(meeting);
 		transaction.commit();
+		return meeting;
 	}
 
-	public void delete(Meeting meeting) {
+	public Meeting delete(Meeting meeting) {
 		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().delete(meeting);
 		transaction.commit();
+		return meeting;
 	}
 
 	public Collection<Meeting> getSortedByTitle() {

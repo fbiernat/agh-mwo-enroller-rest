@@ -95,7 +95,7 @@ public class MeetingRestController {
 		meeting.setDate(updatedMeeting.getDate());
 		meetingService.update(meeting);
 
-		return new ResponseEntity(this.getAll().getBody(), HttpStatus.OK);
+		return new ResponseEntity(meeting, HttpStatus.OK);
 	}
 
 	// Remove meeting's participant
@@ -109,7 +109,7 @@ public class MeetingRestController {
 		meeting.removeParticipant(participant);
 		meetingService.update(meeting);
 
-		return new ResponseEntity(this.getAll().getBody(), HttpStatus.OK);
+		return new ResponseEntity(meeting, HttpStatus.OK);
 	}
 
 	// Delete meeting

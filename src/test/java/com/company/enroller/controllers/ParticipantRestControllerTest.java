@@ -61,7 +61,7 @@ public class ParticipantRestControllerTest {
 		participant.setPassword("testpassword");
 		String inputJSON = "{\"login\": \"testlogin\", \"password\": \"somepassword\"}";
 
-		given(participantService.findByLogin("testlogin")).willReturn((Participant) null);
+		given(participantService.findByLogin("testlogin")).willReturn((Participant)null);
 		given(participantService.add(participant)).willReturn(participant);
 		mvc.perform(post("/participants").content(inputJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isCreated()).andExpect(jsonPath("$.login", is(participant.getLogin())));
@@ -80,7 +80,7 @@ public class ParticipantRestControllerTest {
 		updatedParticipant.setPassword("newpassword");
 		String uInputJSON = "{\"login\": \"testlogin\", \"password\": \"newpassword\"}";
 
-		given(participantService.findByLogin("testlogin")).willReturn((Participant) null);
+		given(participantService.findByLogin("testlogin")).willReturn((Participant)null);
 		given(participantService.update(updatedParticipant)).willReturn(updatedParticipant);
 		mvc.perform(put("/participants/" + updatedParticipant.getLogin()).content(uInputJSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
@@ -104,7 +104,7 @@ public class ParticipantRestControllerTest {
 		participant.setLogin("login");
 		participant.setPassword("password");
 
-		given(participantService.findByLogin(participant.getLogin())).willReturn((Participant) null);
+		given(participantService.findByLogin(participant.getLogin())).willReturn((Participant)null);
 		given(participantService.delete(participant)).willReturn(participant);
 		mvc.perform(delete("/participants/" + participant.getLogin())).andExpect(status().isNotFound());
 

@@ -22,7 +22,7 @@ public class MeetingRestController {
 
 	private MeetingService meetingService;
 	private ParticipantService participantService;
-	
+
 	@Autowired
 	public void setMeetingService(MeetingService meetingService) {
 		this.meetingService = meetingService;
@@ -119,7 +119,7 @@ public class MeetingRestController {
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meetingService.delete(meeting);
-		
+
 		return new ResponseEntity(HttpStatus.OK);
 	}
 

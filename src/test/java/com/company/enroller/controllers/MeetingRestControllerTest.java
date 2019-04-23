@@ -4,17 +4,18 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
+import org.assertj.core.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,8 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.company.enroller.model.Participant;
 import com.company.enroller.model.Meeting;
+import com.company.enroller.model.Participant;
 import com.company.enroller.persistence.MeetingService;
 import com.company.enroller.persistence.ParticipantService;
 
@@ -142,5 +143,28 @@ public class MeetingRestControllerTest {
 		mvc.perform(
 				put("/meetings/" + meeting.getId()).content(updatedMeetingJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void testDeleteParticipant() throws Exception {
+		String reqURL = "/meetings/" + meeting.getId() + "/participants/" + participant.getLogin();
+		Collection<Participant> participants = singletonList(participant);
+		
+		given(meetingService.get(meeting.getId())).willReturn(meeting);
+		given(participantService.findByLogin(participant.getLogin())).willReturn(participant);
+		given(meetingService.getParticipants(meeting.getId())).willReturn(participants);
+		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		
+		// Meeting not found
+		given(meetingService.get(meeting.getId())).willReturn(null);
+		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+		
+		// Participant not found
+		given(participantService.findByLogin(participant.getLogin())).willReturn(null);
+		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+		
+		// Participant not bound to the meeting
+		given(meetingService.getParticipants(meeting.getId())).willReturn(null);
+		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
 	}
 }

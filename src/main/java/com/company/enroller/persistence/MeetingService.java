@@ -22,12 +22,12 @@ public class MeetingService {
 		return connector.getSession().createCriteria(Meeting.class).list();
 	}
 
-	public Meeting getMeeting(long meetingId) {
+	public Meeting get(long meetingId) {
 		return (Meeting) connector.getSession().get(Meeting.class, meetingId);
 	}
 
 	public Collection<Participant> getParticipants(long meetingId) {
-		Meeting meeting = this.getMeeting(meetingId);
+		Meeting meeting = this.get(meetingId);
 		if (meeting == null)
 			return null;
 		return meeting.getParticipants();
@@ -42,7 +42,7 @@ public class MeetingService {
 
 	public Participant addParticipant(long meetingId, Participant newParticipant) {
 		Transaction transaction = connector.getSession().beginTransaction();
-		Meeting meeting = this.getMeeting(meetingId);
+		Meeting meeting = this.get(meetingId);
 		meeting.addParticipant(newParticipant);
 		connector.getSession().save(meeting);
 		connector.getSession().save(newParticipant);

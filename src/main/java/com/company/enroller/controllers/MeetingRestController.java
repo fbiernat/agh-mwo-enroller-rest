@@ -44,7 +44,7 @@ public class MeetingRestController {
 	// Get specific meeting
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> get(@PathVariable("id") long id) {
-		Meeting meeting = meetingService.getMeeting(id);
+		Meeting meeting = meetingService.get(id);
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 
@@ -64,7 +64,7 @@ public class MeetingRestController {
 	// Add meeting
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<?> addParticipant(@RequestBody Meeting newMeeting) {
-		if (meetingService.getMeeting(newMeeting.getId()) != null)
+		if (meetingService.get(newMeeting.getId()) != null)
 			return new ResponseEntity("Unable to add, meeting already exist", HttpStatus.CONFLICT);
 		meetingService.add(newMeeting);
 
@@ -75,7 +75,7 @@ public class MeetingRestController {
 	@RequestMapping(value = "/{id}/participants", method = RequestMethod.POST)
 	public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long meetingId,
 			@RequestBody Participant newParticipant) {
-		Meeting meeting = meetingService.getMeeting(meetingId);
+		Meeting meeting = meetingService.get(meetingId);
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meetingService.addParticipant(meetingId, newParticipant);
@@ -87,7 +87,7 @@ public class MeetingRestController {
 	// Update meeting
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<?> updateMeeting(@PathVariable("id") long meetingId, @RequestBody Meeting updatedMeeting) {
-		Meeting meeting = meetingService.getMeeting(meetingId);
+		Meeting meeting = meetingService.get(meetingId);
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meeting.setTitle(updatedMeeting.getTitle());
@@ -102,7 +102,7 @@ public class MeetingRestController {
 	@RequestMapping(value = "/{id}/participants/{participantId}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteParticipant(@PathVariable("id") long meetingId,
 			@PathVariable("participantId") String login) {
-		Meeting meeting = meetingService.getMeeting(meetingId);
+		Meeting meeting = meetingService.get(meetingId);
 		Participant participant = participantService.findByLogin(login);
 		if (meeting == null || participant == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -115,7 +115,7 @@ public class MeetingRestController {
 	// Delete meeting
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteMeeting(@PathVariable("id") long meetingId) {
-		Meeting meeting = meetingService.getMeeting(meetingId);
+		Meeting meeting = meetingService.get(meetingId);
 		if (meeting == null)
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meetingService.delete(meeting);

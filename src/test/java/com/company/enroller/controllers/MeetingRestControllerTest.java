@@ -104,4 +104,18 @@ public class MeetingRestControllerTest {
 		mvc.perform(post("/meetings").content(meetingInputJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isConflict());
 	}
+
+	@Test
+	public void testAddParticipant() throws Exception {
+		long meetingId = meeting.getId();
+		
+		given(meetingService.getMeeting(meetingId)).willReturn(meeting);
+		given(meetingService.addParticipant(meetingId, participant)).willReturn(participant);
+		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantInputJSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		
+		given(meetingService.getMeeting(meetingId)).willReturn((Meeting)null);
+		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantInputJSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+	}
 }

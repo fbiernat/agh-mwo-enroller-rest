@@ -44,10 +44,12 @@ public class MeetingRestControllerTest {
 	private ParticipantService participantService;
 
 	private Meeting meeting;
+	private Meeting updatedMeeting;
 	private Participant participant;
 
-	private String meetingInputJSON = "{\"id\": \"1\", \"title\": \"meetingtitle\", \"description\": \"meetingdescription\", \"date\": \"22-04-2019\"}";
-	private String participantInputJSON = "{\"login\": \"testlogin\", \"password\": \"testpassword\"}";
+	private String meetingInputJSON;
+	private String updatedMeetingJSON;
+	private String participantJSON;
 
 	@Before
 	public void setup() {
@@ -56,10 +58,19 @@ public class MeetingRestControllerTest {
 		meeting.setTitle("meetingtitle");
 		meeting.setDescription("meetingdescription");
 		meeting.setDate("22-04-2019");
+		meetingInputJSON = "{\"id\": \"1\", \"title\": \"meetingtitle\", \"description\": \"meetingdescription\", \"date\": \"22-04-2019\"}";
+
+		updatedMeeting = new Meeting();
+		updatedMeeting.setId(meeting.getId());
+		updatedMeeting.setTitle("updated meetingtitle");
+		updatedMeeting.setDescription("updated meeting description");
+		updatedMeeting.setDate("23-05-2019");
+		updatedMeetingJSON = "{\"id\": \"1\", \"title\": \"updated meetingtitle\", \"description\": \"updated meeting description\", \"date\": \"23-05-2019\"}";
 
 		participant = new Participant();
 		participant.setLogin("testlogin");
 		participant.setPassword("testpassword");
+		participantJSON = "{\"login\": \"testlogin\", \"password\": \"testpassword\"}";
 	}
 
 	@Test
@@ -72,13 +83,13 @@ public class MeetingRestControllerTest {
 
 	@Test
 	public void testGetMeeting() throws Exception {
-		given(meetingService.getMeeting(meeting.getId())).willReturn((Meeting) null);
-		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isNotFound());
-
-		given(meetingService.getMeeting(meeting.getId())).willReturn(meeting);
+		given(meetingService.get(meeting.getId())).willReturn(meeting);
 		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.title", is(meeting.getTitle())));
+
+		given(meetingService.get(meeting.getId())).willReturn((Meeting) null);
+		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -98,9 +109,9 @@ public class MeetingRestControllerTest {
 	public void testAddMeeting() throws Exception {
 		given(meetingService.add(meeting)).willReturn(meeting);
 		mvc.perform(post("/meetings").content(meetingInputJSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk());
+				.andExpect(status().isOk()).andExpect(jsonPath("$.title", is(meeting.getTitle())));
 
-		given(meetingService.getMeeting(meeting.getId())).willReturn(meeting);
+		given(meetingService.get(meeting.getId())).willReturn(meeting);
 		mvc.perform(post("/meetings").content(meetingInputJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isConflict());
 	}
@@ -108,14 +119,28 @@ public class MeetingRestControllerTest {
 	@Test
 	public void testAddParticipant() throws Exception {
 		long meetingId = meeting.getId();
-		
-		given(meetingService.getMeeting(meetingId)).willReturn(meeting);
+
+		given(meetingService.get(meetingId)).willReturn(meeting);
 		given(meetingService.addParticipant(meetingId, participant)).willReturn(participant);
-		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantInputJSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-		
-		given(meetingService.getMeeting(meetingId)).willReturn((Meeting)null);
-		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantInputJSON)
+		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantJSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.login", is(participant.getLogin())));
+
+		given(meetingService.get(meetingId)).willReturn((Meeting) null);
+		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantJSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void testUpdateMeeting() throws Exception {
+		given(meetingService.get(meeting.getId())).willReturn(meeting);
+		mvc.perform(
+				put("/meetings/" + meeting.getId()).content(updatedMeetingJSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.title", is(updatedMeeting.getTitle())));
+
+		given(meetingService.get(meeting.getId())).willReturn(null);
+		mvc.perform(
+				put("/meetings/" + meeting.getId()).content(updatedMeetingJSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
 	}
 }

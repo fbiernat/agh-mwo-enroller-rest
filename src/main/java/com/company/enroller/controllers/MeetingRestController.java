@@ -104,7 +104,7 @@ public class MeetingRestController {
 			@PathVariable("participantId") String login) {
 		Meeting meeting = meetingService.get(meetingId);
 		Participant participant = participantService.findByLogin(login);
-		if (meeting == null || participant == null)
+		if (meeting == null || participant == null || !meetingService.getParticipants(meetingId).contains(participant))
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meeting.removeParticipant(participant);
 		meetingService.update(meeting);

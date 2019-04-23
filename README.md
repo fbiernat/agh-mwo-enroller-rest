@@ -1,5 +1,5 @@
 # agh-mwo-enroller-rest
-RESTful back-end service for Enroller app
+REST API for Enroller app
 
 ## Live example
 Heroku [mwo-enroller-rest.herokuapp.com](https://mwo-enroller-rest.herokuapp.com)

@@ -4,6 +4,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,11 +13,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
-import org.assertj.core.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,7 +87,7 @@ public class MeetingRestControllerTest {
 		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.title", is(meeting.getTitle())));
 
-		given(meetingService.get(meeting.getId())).willReturn((Meeting) null);
+		given(meetingService.get(meeting.getId())).willReturn((Meeting)null);
 		mvc.perform(get("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
@@ -101,7 +100,7 @@ public class MeetingRestControllerTest {
 				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
 				.andExpect(jsonPath("$[0].login", is(participant.getLogin())));
 
-		given(meetingService.getParticipants(meeting.getId())).willReturn((Collection<Participant>) null);
+		given(meetingService.getParticipants(meeting.getId())).willReturn((Collection<Participant>)null);
 		mvc.perform(get("/meetings/" + meeting.getId() + "/participants").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
@@ -127,7 +126,7 @@ public class MeetingRestControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.login", is(participant.getLogin())));
 
-		given(meetingService.get(meetingId)).willReturn((Meeting) null);
+		given(meetingService.get(meetingId)).willReturn((Meeting)null);
 		mvc.perform(post("/meetings/" + meeting.getId() + "/participants").content(participantJSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
 	}
@@ -139,32 +138,43 @@ public class MeetingRestControllerTest {
 				put("/meetings/" + meeting.getId()).content(updatedMeetingJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.title", is(updatedMeeting.getTitle())));
 
-		given(meetingService.get(meeting.getId())).willReturn(null);
+		given(meetingService.get(meeting.getId())).willReturn((Meeting)null);
 		mvc.perform(
 				put("/meetings/" + meeting.getId()).content(updatedMeetingJSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
-	
+
 	@Test
 	public void testDeleteParticipant() throws Exception {
 		String reqURL = "/meetings/" + meeting.getId() + "/participants/" + participant.getLogin();
 		Collection<Participant> participants = singletonList(participant);
-		
+
 		given(meetingService.get(meeting.getId())).willReturn(meeting);
 		given(participantService.findByLogin(participant.getLogin())).willReturn(participant);
 		given(meetingService.getParticipants(meeting.getId())).willReturn(participants);
 		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-		
+
 		// Meeting not found
-		given(meetingService.get(meeting.getId())).willReturn(null);
+		given(meetingService.get(meeting.getId())).willReturn((Meeting)null);
 		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
-		
+
 		// Participant not found
-		given(participantService.findByLogin(participant.getLogin())).willReturn(null);
+		given(participantService.findByLogin(participant.getLogin())).willReturn((Participant)null);
 		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
-		
+
 		// Participant not bound to the meeting
-		given(meetingService.getParticipants(meeting.getId())).willReturn(null);
+		given(meetingService.getParticipants(meeting.getId())).willReturn((Collection<Participant>)null);
 		mvc.perform(delete(reqURL).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void testDeleteMeeting() throws Exception {
+		given(meetingService.get(meeting.getId())).willReturn(meeting);
+		given(meetingService.delete(meeting)).willReturn(meeting);
+		mvc.perform(delete("/meetings/" + meeting.getId()).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+
+		given(meetingService.get(meeting.getId())).willReturn((Meeting)null);
+		mvc.perform(delete("/meeting/" + meeting.getId())).andExpect(status().isNotFound());
 	}
 }

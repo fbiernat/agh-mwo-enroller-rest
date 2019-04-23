@@ -68,7 +68,7 @@ public class MeetingRestController {
 			return new ResponseEntity("Unable to add, meeting already exist", HttpStatus.CONFLICT);
 		meetingService.add(newMeeting);
 
-		return new ResponseEntity("Meeting added", HttpStatus.OK);
+		return new ResponseEntity(newMeeting, HttpStatus.OK);
 	}
 
 	// Add participant to the meeting
@@ -80,7 +80,7 @@ public class MeetingRestController {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		meetingService.addParticipant(meetingId, newParticipant);
 
-		return new ResponseEntity("Participant added", HttpStatus.OK);
+		return new ResponseEntity(newParticipant, HttpStatus.OK);
 	}
 
 	// 2 ---------------------------------------------------------------

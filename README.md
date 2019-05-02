@@ -2,6 +2,8 @@
 REST API for Enroller app
 
 ## Paths
+### GET
+
 | Path | Resource description |
 | ------------- | --------------- |
 |`/participants`| all participants|

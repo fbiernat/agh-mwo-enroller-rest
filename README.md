@@ -1,9 +1,6 @@
 # agh-mwo-enroller-rest
 REST API for Enroller app
 
-## Live example
-Heroku [mwo-enroller-rest.herokuapp.com](https://mwo-enroller-rest.herokuapp.com)
-
 ## Paths
 | Path | Resource description |
 | ------------- | --------------- |
